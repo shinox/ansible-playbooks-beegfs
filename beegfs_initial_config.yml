@@ -1,0 +1,112 @@
+---
+- hosts: tulip
+  vars:
+    masterHome: /home/beegfs_mgmtd
+  tasks:  
+  - name: Configure Management Daemon mgmtd
+    command: /opt/beegfs/sbin/beegfs-setup-mgmtd -p "{{ masterHome }}" creates=/home/beegfs-mgmtd-configured
+  
+
+- hosts: tulip
+  vars:
+      metaHome: /home/beegfs_meta
+      metaID: 0
+      masterName: masterbee
+
+  tasks:  
+  - name: Configure META
+    command: /opt/beegfs/sbin/beegfs-setup-meta -p "{{ metaHome }}" -s "{{ metaID }}" -m "{{ masterName }}" creates=/home/beegfs-meta-configured
+
+- hosts: tulip
+  tasks:  
+  - name: Configure Management Admon, sysMgmtdHost
+    lineinfile:
+               dest=/etc/beegfs/beegfs-admon.conf
+               regexp="^sysMgmtdHost ="
+               line="sysMgmtdHost = masterbee"
+
+- hosts: tulip
+  vars:
+      masterName: masterbee
+  tasks:  
+  - name: Configure Client
+    command: /opt/beegfs/sbin/beegfs-setup-client -m "{{ masterName }}" creates=/home/beegfs-client-configured
+
+#
+# This should be done on all storage nodes, here also Manager cause is store as well
+#
+# Two options here, either global vars or better generate this using .sh script and file with server details,
+#
+- hosts: tulip
+  vars:
+      masterName: masterbee
+      storageHome: /mnt/store
+      nodeNumID: 0
+      targetID: 001
+      nodeID: store0 
+  tasks:  
+  - name: Configure Stores, Script 
+    command: /opt/beegfs/sbin/beegfs-setup-storage -p "{{ storageHome }}" -s "{{ nodeNumID }}" -i "{{ targetID }}" -m "{{ masterName }}" creates=/home/beegfs-store0-configured
+
+  - name: Configure Stores, Manual Node IDs
+    command: echo "{{ nodeID }}" > /mnt/store/nodeID
+
+- hosts: vickie
+  vars:
+      masterName: masterbee
+      storageHome: /mnt/store
+      nodeNumID: 1
+      targetID: 101
+      nodeID: store1 
+  tasks:  
+  - name: Configure Stores, Script 
+    command: /opt/beegfs/sbin/beegfs-setup-storage -p "{{ storageHome }}" -s "{{ nodeNumID }}" -i "{{ targetID }}" -m "{{ masterName }}" creates=/home/beegfs-store1-configured
+
+  - name: Configure Stores, Manual Node IDs 
+    command: echo "{{ nodeID }}" > /mnt/store/nodeID
+
+- hosts: alf
+  vars:
+      masterName: masterbee
+      storageHome: /mnt/store
+      nodeNumID: 2
+      targetID: 201
+      nodeID: store2 
+  tasks:  
+  - name: Configure Stores, Script 
+    command: /opt/beegfs/sbin/beegfs-setup-storage -p "{{ storageHome }}" -s "{{ nodeNumID }}" -i "{{ targetID }}" -m "{{ masterName }}" creates=/home/beegfs-store2-configured
+
+  - name: Configure Stores, Manual Node IDs 
+    command: echo "{{ nodeID }}" > /mnt/store/nodeID
+
+# Add hosts entries for all Internal IPs and nodeIDs
+- hosts: hive
+  tasks:
+  - name: Add Hosts for internal traffic
+    lineinfile:
+      dest=/etc/hosts
+      regexp="^10.0.255.1"
+      line="10.0.255.1 store0 masterbee meta0"
+      owner=root
+      state=present
+      insertafter=EOF
+      create=False
+  - name: Add Hosts for internal traffic
+    lineinfile:
+      dest=/etc/hosts
+      regexp="^10.0.255.100"
+      line="10.0.255.100 store1"
+      owner=root
+      state=present
+      insertafter=EOF
+      create=False
+  - name: Add Hosts for internal traffic
+    lineinfile:
+      dest=/etc/hosts
+      regexp="^10.0.255.105"
+      line="10.0.255.105 store2"
+      owner=root
+      state=present
+      insertafter=EOF
+      create=False
+
