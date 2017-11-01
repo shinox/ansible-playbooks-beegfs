@@ -1,0 +1,18 @@
+---
+- hosts: client
+  tasks:
+  - name: Configure Beegfs mapping
+    lineinfile:
+      dest=/etc/beegfs/beegfs-mounts.conf
+      line="/mnt/beegfs /etc/beegfs/beegfs-client.conf" 
+      owner=root
+      state=present
+
+    notify:
+      - restart beegfs-client
+
+  handlers:
+  - name: restart beegfs-client
+    service:
+      name=beegfs-client
+      state=restarted
