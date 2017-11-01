@@ -1,0 +1,41 @@
+---
+- hosts: tulip
+  tasks:
+  - name: Start master services
+    service:
+        name: beegfs-mgmtd
+        state: restarted
+
+  - name: Start admon services
+    service:
+        name: beegfs-admon
+        state: restarted
+
+- hosts: tulip
+  tasks:
+  - name: Start meta services
+    service:
+        name: beegfs-meta
+        state: restarted
+
+- hosts: hive
+  tasks:
+  - name: Start storage services
+    service:
+        name: beegfs-storage
+        state: restarted
+  
+- hosts: tulip
+  tasks:
+  - name: Start helperd services
+    service:
+        name: beegfs-helperd
+        state: restarted
+
+- hosts: tulip
+  tasks:
+  - name: Start client services
+    service:
+        name: beegfs-client
+        state: restarted
+
