@@ -1,5 +1,5 @@
 ---
-- hosts: tulip
+- hosts: manager
   vars:
     masterHome: /home/beegfs_mgmtd
   tasks:  
@@ -7,7 +7,7 @@
     command: /opt/beegfs/sbin/beegfs-setup-mgmtd -p "{{ masterHome }}" creates=/home/beegfs-mgmtd-configured
   
 
-- hosts: tulip
+- hosts: meta
   vars:
       metaHome: /home/beegfs_meta
       metaID: 0
@@ -17,7 +17,7 @@
   - name: Configure META
     command: /opt/beegfs/sbin/beegfs-setup-meta -p "{{ metaHome }}" -s "{{ metaID }}" -m "{{ masterName }}" creates=/home/beegfs-meta-configured
 
-- hosts: tulip
+- hosts: manager
   tasks:  
   - name: Configure Management Admon, sysMgmtdHost
     lineinfile:
@@ -25,7 +25,7 @@
                regexp="^sysMgmtdHost ="
                line="sysMgmtdHost = masterbee"
 
-- hosts: tulip
+- hosts: manager
   vars:
       masterName: masterbee
   tasks:  
@@ -37,7 +37,7 @@
 #
 # Two options here, either global vars or better generate this using .sh script and file with server details,
 #
-- hosts: tulip
+- hosts: manager
   vars:
       masterName: masterbee
       storageHome: /mnt/store
@@ -51,7 +51,7 @@
   - name: Configure Stores, Manual Node IDs
     command: echo "{{ nodeID }}" > /mnt/store/nodeID
 
-- hosts: vickie
+- hosts: drone1
   vars:
       masterName: masterbee
       storageHome: /mnt/store
@@ -65,7 +65,7 @@
   - name: Configure Stores, Manual Node IDs 
     command: echo "{{ nodeID }}" > /mnt/store/nodeID
 
-- hosts: alf
+- hosts: drone2
   vars:
       masterName: masterbee
       storageHome: /mnt/store
