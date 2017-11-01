@@ -1,0 +1,68 @@
+---
+- hosts: all
+  tasks: 
+  - name: Run the equivalent of "apt-get update" as a separate step
+    apt:
+        update_cache: yes
+
+  - name: Update all packages to the latest version
+    apt:
+        upgrade: dist
+
+- hosts: "tulip"
+  tasks:
+  - name: Install master bee 
+    apt:
+        name: beegfs-mgmtd 
+        state: present
+
+  - name: Install meta
+    apt:
+        name:  beegfs-meta
+        state: present
+
+  - name: Install admon
+    apt:
+        name:  beegfs-admon
+        state: present
+
+- hosts: hive
+  tasks:
+  - name: Install bees
+    apt:
+        name: beegfs-storage
+        state: present
+     
+  - name: Bees client 
+    apt: 
+        name: beegfs-client
+        state: latest
+
+  - name: Bees helperd 
+    apt: 
+        name:  beegfs-helperd
+        state: latest
+
+  - name: Bees utils
+    apt: 
+        name: beegfs-utils
+        state: latest
+
+  - name: Bees common
+    apt: 
+        name: beegfs-common
+        state: latest
+
+  - name: Bees opentk-lib 
+    apt: 
+        name: beegfs-opentk-lib
+        state: latest
+
+  - name: XFS tools 
+    apt: 
+        name: xfsprogs
+        state: latest
+        with_items:
+        - xfsdump 
+        - xfslibs-dev
+
