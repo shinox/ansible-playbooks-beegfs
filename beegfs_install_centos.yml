@@ -1,0 +1,68 @@
+---
+- hosts: all
+  tasks:
+  - name: Run the equivalent of "apt-get update" as a separate step
+    yum_repository:
+    name: beegfs-rhel7.repo
+    description: BeeGFS YUM repo
+#    baseurl: https://www.beegfs.io/release/latest-stable/dists/beegfs-rhel7.repo
+    baseurl: http://www.beegfs.io/release/beegfs_6/dists/rhel7
+    gpgkey: gpgkey=http://www.beegfs.io/release/beegfs_6/gpg/RPM-GPG-KEY-beegfs
+    gpgcheck: yes
+
+  - name: upgrade all packages, excluding kernel & foo related packages
+    yum:
+    name: '*'
+    state: latest
+    exclude: kernel*
+
+
+- hosts: "tulip"
+  tasks:
+  - name: Install master bee 
+    yum:
+        name: beegfs-mgmtd 
+        state: present
+
+  - name: Install meta
+    yum:
+        name:  beegfs-meta
+        state: present
+
+  - name: Install admon
+    yum:
+        name:  beegfs-admon
+        state: present
+
+- hosts: hive
+  tasks:
+  - name: Install bees
+    yum:
+        name: beegfs-storage
+        state: present
+     
+  - name: Bees client 
+    yum: 
+        name: beegfs-client
+        state: latest
+
+  - name: Bees helperd 
+    yum: 
+        name:  beegfs-helperd
+        state: latest
+
+  - name: Bees utils
+    yum: 
+        name: beegfs-utils
+        state: latest
+
+  - name: Bees common
+    yum: 
+        name: beegfs-common
+        state: latest
+
+  - name: Bees opentk-lib 
+    yum: 
+        name: beegfs-opentk-lib
+        state: latest
+
