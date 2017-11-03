@@ -68,9 +68,9 @@
 
   - name: XFS tools 
     apt: 
-        name: xfsprogs
-        state: latest
-        with_items:
-        - xfsdump 
-        - xfslibs-dev
-
+        name: "{{ item }}"
+        state: latest        
+    with_items:
+          - - xfsprogs
+            - xfsdump 
+            - xfslibs-dev
