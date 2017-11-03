@@ -81,32 +81,20 @@
 
 # Add hosts entries for all Internal IPs and nodeIDs
 - hosts: hive
+  vars:
+      hosts:
+          - - "10.0.255.1 store0 masterbee meta0"
+            - "10.0.255.100 store1"
+            - "10.0.255.105 store2"
   tasks:
   - name: Add Hosts for internal traffic
     lineinfile:
-      dest=/etc/hosts
-      regexp="^10.0.255.1"
-      line="10.0.255.1 store0 masterbee meta0"
-      owner=root
-      state=present
-      insertafter=EOF
-      create=False
-  - name: Add Hosts for internal traffic
-    lineinfile:
-      dest=/etc/hosts
-      regexp="^10.0.255.100"
-      line="10.0.255.100 store1"
-      owner=root
-      state=present
-      insertafter=EOF
-      create=False
-  - name: Add Hosts for internal traffic
-    lineinfile:
-      dest=/etc/hosts
-      regexp="^10.0.255.105"
-      line="10.0.255.105 store2"
-      owner=root
-      state=present
-      insertafter=EOF
-      create=False
+      dest: /etc/hosts
+      regexp: "^{{ item }}"
+      line: "{{ item }}"
+      owner: root
+      state: present      
+      create: False
+    with_items: "{{ hosts }}"
+   
 
