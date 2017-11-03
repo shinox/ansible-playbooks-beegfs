@@ -37,47 +37,23 @@
 #
 # Two options here, either global vars or better generate this using .sh script and file with server details,
 #
-- hosts: manager
+- hosts: drone
   vars:
       masterName: masterbee
       storageHome: /mnt/store
-      nodeNumID: 0
-      targetID: 001
-      nodeID: store0 
+      nodeNums:
+          - - "1"
+            - "2"
+            - "3"
+            
   tasks:  
   - name: Configure Stores, Script 
-    command: /opt/beegfs/sbin/beegfs-setup-storage -p "{{ storageHome }}" -s "{{ nodeNumID }}" -i "{{ targetID }}" -m "{{ masterName }}" creates=/home/beegfs-store0-configured
+    command: /opt/beegfs/sbin/beegfs-setup-storage -p "{{ storageHome }}" -s "{{ item }}" -m "{{ masterName }}" creates=/home/beegfs-store0-configured
+    with_items: "{{ nodeNums }}"
 
   - name: Configure Stores, Manual Node IDs
-    command: echo "{{ nodeID }}" > /mnt/store/nodeID
-
-- hosts: drone1
-  vars:
-      masterName: masterbee
-      storageHome: /mnt/store
-      nodeNumID: 1
-      targetID: 101
-      nodeID: store1 
-  tasks:  
-  - name: Configure Stores, Script 
-    command: /opt/beegfs/sbin/beegfs-setup-storage -p "{{ storageHome }}" -s "{{ nodeNumID }}" -i "{{ targetID }}" -m "{{ masterName }}" creates=/home/beegfs-store1-configured
-
-  - name: Configure Stores, Manual Node IDs 
-    command: echo "{{ nodeID }}" > /mnt/store/nodeID
-
-- hosts: drone2
-  vars:
-      masterName: masterbee
-      storageHome: /mnt/store
-      nodeNumID: 2
-      targetID: 201
-      nodeID: store2 
-  tasks:  
-  - name: Configure Stores, Script 
-    command: /opt/beegfs/sbin/beegfs-setup-storage -p "{{ storageHome }}" -s "{{ nodeNumID }}" -i "{{ targetID }}" -m "{{ masterName }}" creates=/home/beegfs-store2-configured
-
-  - name: Configure Stores, Manual Node IDs 
-    command: echo "{{ nodeID }}" > /mnt/store/nodeID
+    command: echo store"{{ item }}" > /mnt/store/nodeID
+    with_items: "{{ nodeNums }}"
 
 # Add hosts entries for all Internal IPs and nodeIDs
 - hosts: hive
