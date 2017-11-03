@@ -1,6 +1,16 @@
 ---
 - hosts: all
-  tasks: 
+  vars:
+      sourcesList: /etc/apt/sources.list.d/beegfs-deb8.list
+  tasks:
+  - name: Add BeeGFS key
+    apt_key:
+    url:     https://www.beegfs.io/release/latest-stable/gpg/DEB-GPG-KEY-beegfs
+    state:   present
+    
+  - name: Add BeeGFS Repo
+    shell: echo "deb [arch=amd64] http://www.beegfs.io/release/beegfs_6 deb8 non-free" > "{{ sourcesList }}"
+   
   - name: Run the equivalent of "apt-get update" as a separate step
     apt:
         update_cache: yes
